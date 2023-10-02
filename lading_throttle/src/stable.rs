@@ -112,7 +112,12 @@ impl Valve {
             return Err(Error::Capacity);
         }
 
+        #[cfg(not(kani))]
         let current_interval = ticks_elapsed / INTERVAL_TICKS;
+
+        #[cfg(kani)]
+        let current_interval: u64 = kani::any();
+
         if current_interval > self.interval {
             // We have rolled forward into a new interval. At this point the
             // capacity is reset to maximum -- no matter how deep we are into
@@ -251,7 +256,12 @@ mod verification {
 
             ticks_elapsed += slop;
 
+            #[cfg(not(kani))]
             let current_interval = ticks_elapsed / INTERVAL_TICKS;
+
+            #[cfg(kani)]
+            let current_interval: u64 = kani::any();
+
             if interval < current_interval {
                 // We have entered into a new interval, the granted requests
                 // must be reset.
